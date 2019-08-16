@@ -1,0 +1,70 @@
+doctype html
+html(lang='')
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title Image Kit Assignment
+    meta(name='description', content='')
+    meta(name='theme-color' content='#4DA5F4')
+    meta(name='csrf-token', content=_csrf)
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+  
+  body
+    .container
+      .row
+        .col.mt-5.pt-5
+          form.form-horizontal(id='signup-form', method='POST', action='/register')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group.row.justify-content-md-center
+              label.col-sm-3.col-form-label.text-right.font-weight-bold(for='name') Name
+              .col-sm-7
+                input.form-control(type='text', name='name', id='name', placeholder='Name', autofocus, required)
+            .form-group.row.justify-content-md-center
+              label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') Email
+              .col-sm-7
+                input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+            .form-group.row.justify-content-md-center
+              label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') Password
+              .col-sm-7
+                input.form-control(type='password', name='password', id='password', placeholder='Password', required)
+            .form-group.row.justify-content-md-center
+              label.col-sm-3.col-form-label.text-right.font-weight-bold(for='confirmPassword') Confirm Password
+              .col-sm-7
+                input.form-control(type='password', name='confirmPassword', id='confirmPassword', placeholder='Confirm Password', required)
+            if recaptchaEnabled
+              .row.justify-content-md-center.mb-3
+                .col-sm-4
+                  div.g-recaptcha(data-sitekey=siteKey)
+            .form-group.row.justify-content-md-center
+              .col-sm-1
+                button.btn.btn-success#submitBtn
+                  | Signup
+    script(src="https://www.google.com/recaptcha/api.js")
+    script(src="https://code.jquery.com/jquery-3.4.1.min.js")
+    script.
+      $(document).ready(function () {
+        function validateForm(){
+
+          return $("#password").val() === $("#confirmPassword").val() && (#{!recaptchaEnabled} || $("#g-recaptcha-response").val())
+        }
+        $("form").submit(function(event) {
+          event.preventDefault();
+          if (validateForm()){
+            var formData = new FormData(document.querySelector('form'))
+            $.ajax({
+                url: '/register',
+                type: 'post',
+                dataType: 'json',
+                data: $('form#signup-form').serialize(),
+                success: function(data) {
+                    alert(data['message']);
+                    location.reload();
+                  }
+            });
+          } else {
+            alert("Form has some errors")
+          }
+        });
+      })
+      
